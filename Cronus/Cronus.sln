@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cronus", "Cronus\Cronus.csproj", "{B1084B2F-9F0F-458F-8F5A-8E8E61C8380B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1084B2F-9F0F-458F-8F5A-8E8E61C8380B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1084B2F-9F0F-458F-8F5A-8E8E61C8380B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1084B2F-9F0F-458F-8F5A-8E8E61C8380B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1084B2F-9F0F-458F-8F5A-8E8E61C8380B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1EC75918-E769-4F71-9F3D-707F80D3F360}
+	EndGlobalSection
+EndGlobal
