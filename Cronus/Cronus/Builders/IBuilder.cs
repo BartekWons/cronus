@@ -2,5 +2,5 @@
 
 public interface IBuilder<T> where T : class
 {
-    T Build();
+    Task<T> Build();
 }

@@ -1,4 +1,5 @@
 ﻿using Cronus.Attributes;
+using Cronus.Database;
 using Cronus.Database.Model;
 using Cronus.Exceptions;
 using Cronus.Mappers;
@@ -69,11 +70,18 @@ public class DbBuilder : IBuilder<Database.Database>
         return this;
     }
 
-    public Database.Database Build()
+    public DbBuilder AddConnectionString(string connectionString)
     {
-        //TODO: add saving structure to file
+        _database.Config.ConnectionString = connectionString;
+        return this;
+    }
 
-        //_database.Create();
-        return _database;
+    public async Task<Database.Database> Build()
+    {
+        if (String.IsNullOrEmpty(_database.Config.ConnectionString))
+            throw new InvalidConnectionStringException("Connection string is null or empty");
+        var handler = new DatabaseModelFileHandler(_database.Model);
+        await handler.SaveAsync(_database.Config.ConnectionString);
+            return _database;
     }
 }
