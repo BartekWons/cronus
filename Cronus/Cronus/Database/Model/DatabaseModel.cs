@@ -1,6 +1,6 @@
 ﻿namespace Cronus.Database.Model;
 
-public class DatabaseModel
+internal class DatabaseModel
 {
-    public List<TableModel> Tables { get; set; } = [];
+    internal List<TableModel> Tables { get; set; } = [];
 }

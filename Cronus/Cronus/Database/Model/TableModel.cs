@@ -1,7 +1,7 @@
 ﻿namespace Cronus.Database.Model;
 
-public class TableModel
+internal class TableModel
 {
-    public string Name { get; set; } = default!;
-    public List<ColumnModel>? Columns { get; set; }
+    internal string Name { get; set; } = default!;
+    internal List<ColumnModel>? Columns { get; set; }
 }
