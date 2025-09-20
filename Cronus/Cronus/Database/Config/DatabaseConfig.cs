@@ -1,4 +1,5 @@
-﻿using Cronus.Exceptions;
+﻿using Cronus.Database.Helpers;
+using Cronus.Exceptions;
 
 namespace Cronus.Database.Config;
 

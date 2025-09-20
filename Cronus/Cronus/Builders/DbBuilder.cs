@@ -1,8 +1,8 @@
 ﻿using Cronus.Attributes;
 using Cronus.Database;
+using Cronus.Database.Helpers;
 using Cronus.Database.Model;
 using Cronus.Exceptions;
-using Cronus.Mappers;
 using System.Reflection;
 
 namespace Cronus.Builders;
@@ -29,20 +29,20 @@ public class DbBuilder : IBuilder<Database.Database>
 
         foreach (var prop in table.GetProperties())
         {
-            var notMappedAttribute = prop.GetCustomAttribute<NotMappedAttribute>();
-            if (notMappedAttribute is not null)
+            var helper = new AttributeHelper(prop);
+
+            if (helper.IsNotMapped())
                 continue;
 
-            var columnAttribute = prop.GetCustomAttribute<ColumnAttribute>();
-            var columnName = columnAttribute?.Name ?? prop.Name;
+            var columnName = helper.GetColumnName();
+            bool isPrimaryKey = helper.IsPrimaryKey();
 
-            var primaryKeyAttribute = prop.GetCustomAttribute<PrimaryKeyAttribute>();
-            bool isPrimaryKey = primaryKeyAttribute is not null;
-            // add check if PK is int
+            if (isPrimaryKey && !helper.IsPrimaryKeyInteger())
+            {
+                throw new AttributeNotFoundException("Primary Key is not an integer");
+            }
 
-            var temp = prop.PropertyType;
-            var mapper = new AllowedTypeMapper();
-            var type = mapper.Map(temp).ToString();
+            var type = helper.GetPropertyType();
 
             columns.Add(new ColumnModel
             {
