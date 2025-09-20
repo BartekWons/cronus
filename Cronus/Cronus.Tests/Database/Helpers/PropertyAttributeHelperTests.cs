@@ -10,7 +10,7 @@ using System.Reflection;
 namespace Cronus.Tests.Database.Helpers
 {
     [TestFixture]
-    public class AttributeHelperTests
+    public class PropertyAttributeHelperTests
     {
         private PropertyInfo? GetProperty(string name)
         {
@@ -21,7 +21,7 @@ namespace Cronus.Tests.Database.Helpers
         public void ValidPrimaryKeyType()
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.ValidPrimaryKey));
-            var helper = new AttributeHelper(prop);
+            var helper = new PropertyAttributeHelper(prop);
             helper.Invoking(h => h.IsPrimaryKeyInteger()).Should().NotThrow();
         }
 
@@ -29,7 +29,7 @@ namespace Cronus.Tests.Database.Helpers
         public void IsPrimaryKey()
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.ValidPrimaryKey));
-            var helper = new AttributeHelper(prop);
+            var helper = new PropertyAttributeHelper(prop);
             helper.IsPrimaryKey().Should().BeTrue();
         }
 
@@ -37,7 +37,7 @@ namespace Cronus.Tests.Database.Helpers
         public void IsNotPrimaryKey()
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.IgnoredProperty));
-            var helper = new AttributeHelper(prop);
+            var helper = new PropertyAttributeHelper(prop);
             helper.IsPrimaryKey().Should().BeFalse();
         }
 
@@ -45,7 +45,7 @@ namespace Cronus.Tests.Database.Helpers
         public void InvalidPrimaryKeyType()
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.InvalidPrimaryKey));
-            var helper = new AttributeHelper(prop);
+            var helper = new PropertyAttributeHelper(prop);
             helper.IsPrimaryKeyInteger().Should().BeFalse();
         }
 
@@ -53,7 +53,7 @@ namespace Cronus.Tests.Database.Helpers
         public void IsNotMapped()
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.IgnoredProperty));
-            var helper = new AttributeHelper(prop);
+            var helper = new PropertyAttributeHelper(prop);
             helper.IsNotMapped().Should().BeTrue();
         }
 
@@ -61,7 +61,7 @@ namespace Cronus.Tests.Database.Helpers
         public void NormalTableName()
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.ColumnName));
-            var helper = new AttributeHelper(prop);
+            var helper = new PropertyAttributeHelper(prop);
             helper.GetColumnName().Should().Be(nameof(AttributeHelperTestModel.ColumnName));
         }
 
@@ -69,7 +69,7 @@ namespace Cronus.Tests.Database.Helpers
         public void CustomTableName()
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.ColumnWithCustomName));
-            var helper = new AttributeHelper(prop);
+            var helper = new PropertyAttributeHelper(prop);
             helper.GetColumnName().Should().Be("custom_column");
         }
     }

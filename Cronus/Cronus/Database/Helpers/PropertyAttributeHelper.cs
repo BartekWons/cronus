@@ -6,11 +6,11 @@ using CronusAttributes = Cronus.Attributes;
 
 namespace Cronus.Database.Helpers;
 
-public class AttributeHelper
+public class PropertyAttributeHelper
 {
     private readonly PropertyInfo _property;
 
-    public AttributeHelper(PropertyInfo property)
+    public PropertyAttributeHelper(PropertyInfo property)
     {
         _property = property;
     }

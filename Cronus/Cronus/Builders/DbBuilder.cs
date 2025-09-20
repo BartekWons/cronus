@@ -1,9 +1,7 @@
-﻿using Cronus.Attributes;
-using Cronus.Database;
+﻿using Cronus.Database;
 using Cronus.Database.Helpers;
 using Cronus.Database.Model;
 using Cronus.Exceptions;
-using System.Reflection;
 
 namespace Cronus.Builders;
 
@@ -19,17 +17,14 @@ public class DbBuilder : IBuilder<Database.Database>
 
     public DbBuilder AddTable(Type table)
     {
-        var tableAttribute = table.GetCustomAttribute<TableAttribute>();
-        if (tableAttribute is null)
-            throw new AttributeNotFoundException();
-
-        var tableName = tableAttribute.Name;
+        var tableProp = new TypeAttributeHelper(table);
+        var tableName = tableProp.GetTableName();
 
         var columns = new List<ColumnModel>();
 
         foreach (var prop in table.GetProperties())
         {
-            var helper = new AttributeHelper(prop);
+            var helper = new PropertyAttributeHelper(prop);
 
             if (helper.IsNotMapped())
                 continue;
