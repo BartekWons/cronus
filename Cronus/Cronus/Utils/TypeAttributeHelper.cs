@@ -2,23 +2,22 @@
 using Cronus.Exceptions;
 using System.Reflection;
 
-namespace Cronus.Utils
+namespace Cronus.Utils;
+
+internal class TypeAttributeHelper
 {
-    internal class TypeAttributeHelper
+    private Type _type;
+
+    public TypeAttributeHelper(Type type)
     {
-        private Type _type;
+        _type = type;
+    }
 
-        public TypeAttributeHelper(Type type)
-        {
-            _type = type;
-        }
-
-        internal string? GetTableName()
-        {
-            var tableAttribute = _type.GetCustomAttribute<TableAttribute>();
-            if (tableAttribute is null)
-                throw new AttributeNotFoundException("Missing Table attribute");
-            return tableAttribute.Name;
-        }
+    internal string? GetTableName()
+    {
+        var tableAttribute = _type.GetCustomAttribute<TableAttribute>();
+        if (tableAttribute is null)
+            throw new AttributeNotFoundException("Missing Table attribute");
+        return tableAttribute.Name;
     }
 }
