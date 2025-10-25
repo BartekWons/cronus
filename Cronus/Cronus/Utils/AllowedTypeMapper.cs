@@ -1,6 +1,6 @@
-﻿using Cronus.Types;
+﻿using Cronus.Interfaces;
 
-namespace Cronus.Mappers;
+namespace Cronus.Utils;
 
 internal class AllowedTypeMapper : IMapper<AllowedType, Type>
 {

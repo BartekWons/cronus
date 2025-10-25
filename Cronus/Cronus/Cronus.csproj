@@ -11,5 +11,4 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	  <InternalsVisibleTo Include="Cronus.Tests" />
   </ItemGroup>
-
 </Project>

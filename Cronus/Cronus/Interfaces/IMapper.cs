@@ -1,4 +1,4 @@
-﻿namespace Cronus.Mappers;
+﻿namespace Cronus.Interfaces;
 
 internal interface IMapper<T,U>
 {

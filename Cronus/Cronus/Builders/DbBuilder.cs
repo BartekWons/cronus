@@ -1,7 +1,6 @@
-﻿using Cronus.Database;
-using Cronus.Database.Helpers;
-using Cronus.Database.Model;
+﻿using Cronus.Database.Model;
 using Cronus.Exceptions;
+using Cronus.Utils;
 
 namespace Cronus.Builders;
 

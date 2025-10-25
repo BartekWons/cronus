@@ -1,4 +1,4 @@
-﻿namespace Cronus.Types;
+﻿namespace Cronus.Utils;
 
 public enum AllowedType
 {

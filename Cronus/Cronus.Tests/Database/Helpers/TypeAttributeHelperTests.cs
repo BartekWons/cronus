@@ -1,6 +1,6 @@
-﻿using Cronus.Database.Helpers;
-using Cronus.Exceptions;
+﻿using Cronus.Exceptions;
 using Cronus.Tests.TestModels;
+using Cronus.Utils;
 using FluentAssertions;
 using NUnit.Framework;
 

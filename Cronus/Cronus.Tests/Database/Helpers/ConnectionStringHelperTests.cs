@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using Cronus.Utils;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace Cronus.Database.Helpers.Tests;

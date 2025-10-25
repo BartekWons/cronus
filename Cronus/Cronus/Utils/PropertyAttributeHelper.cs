@@ -1,10 +1,7 @@
-﻿using Cronus.Exceptions;
-using Cronus.Mappers;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection;
+﻿using System.Reflection;
 using CronusAttributes = Cronus.Attributes;
 
-namespace Cronus.Database.Helpers;
+namespace Cronus.Utils;
 
 public class PropertyAttributeHelper
 {

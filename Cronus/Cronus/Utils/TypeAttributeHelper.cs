@@ -2,7 +2,7 @@
 using Cronus.Exceptions;
 using System.Reflection;
 
-namespace Cronus.Database.Helpers
+namespace Cronus.Utils
 {
     internal class TypeAttributeHelper
     {

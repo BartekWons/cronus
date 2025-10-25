@@ -1,4 +1,4 @@
-﻿using Cronus.Types;
+﻿using Cronus.Utils;
 using FluentAssertions;
 using NUnit.Framework;
 

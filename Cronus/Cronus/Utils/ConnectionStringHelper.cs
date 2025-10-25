@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Cronus.Database.Helpers;
+namespace Cronus.Utils;
 
 internal partial class ConnectionStringHandler
 {
