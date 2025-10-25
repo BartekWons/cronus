@@ -20,9 +20,4 @@ internal class TypeAttributeHelper
             throw new AttributeNotFoundException("Missing Table attribute");
         return tableAttribute.Name;
     }
-
-    internal PropertyInfo? GetPrimaryKeyInfo()
-    {
-        return _type.GetProperties().FirstOrDefault(prop => prop.GetCustomAttribute<PrimaryKeyAttribute>() is not null);
-    }
 }
