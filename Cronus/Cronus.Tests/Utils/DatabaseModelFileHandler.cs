@@ -2,7 +2,7 @@
 using Cronus.Interfaces;
 using Newtonsoft.Json;
 
-namespace Cronus.Database;
+namespace Cronus.Tests.Utils;
 
 internal class DatabaseModelFileHandler : IFileReader<DatabaseModel>, IFileSaver
 {

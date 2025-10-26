@@ -2,7 +2,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Cronus.Mappers.Tests
+namespace Cronus.Tests.Utils
 {
     [TestFixture()]
     public class AllowedTypesMapperTests

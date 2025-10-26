@@ -4,7 +4,7 @@ using Cronus.Utils;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Cronus.Tests.Database.Helpers
+namespace Cronus.Tests.Utils
 {
     [TestFixture]
     public class TypeAttributeHelperTests

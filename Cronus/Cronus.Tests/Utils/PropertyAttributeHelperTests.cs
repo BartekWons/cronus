@@ -5,7 +5,7 @@ using NUnit.Framework;
 using NUnit.Framework.Internal;
 using System.Reflection;
 
-namespace Cronus.Tests.Database.Helpers
+namespace Cronus.Tests.Utils
 {
     [TestFixture]
     public class PropertyAttributeHelperTests

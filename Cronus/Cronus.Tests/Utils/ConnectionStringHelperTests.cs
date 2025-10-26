@@ -2,7 +2,7 @@
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace Cronus.Database.Helpers.Tests;
+namespace Cronus.Tests.Utils;
 
 [TestFixture()]
 public class ConnectionStringHelperTests
