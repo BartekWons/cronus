@@ -5,7 +5,7 @@ namespace Cronus.Database;
 
 internal class DatabaseConfig
 {
-    internal string ConnectionString { get; set; } = default!;
+    internal string ConnectionString { get; private set; } = default!;
     internal string Name { get; private set; } = default!;
     internal string Id { get; private set; } = default!;
 

@@ -40,6 +40,8 @@ namespace Cronus.Mappers.Tests
         [TestCase("boolean", AllowedType.Boolean)]
         [TestCase("integer", AllowedType.Integer)]
         [TestCase("double", AllowedType.Double)]
+        [TestCase("bool", AllowedType.Boolean)]
+        [TestCase("Bool", AllowedType.Boolean)]
         public void MapFromStringTest_ValidType(string type, AllowedType expectedType)
         {
             var mapper = new AllowedTypeMapper();
@@ -54,14 +56,6 @@ namespace Cronus.Mappers.Tests
             var mapper = new AllowedTypeMapper();
             var act = () => mapper.MapFromString(type);
             act.Should().Throw<NotSupportedException>();
-        }
-
-        [Test()]
-        public void MapFromStringTest_BoolType()
-        {
-            var mapper = new AllowedTypeMapper();
-            var act = () => mapper.MapFromString("bool");
-            act.Should().Throw<NotSupportedException>().WithMessage("Type bool is not supported, use Boolean instead");
         }
     }
 }

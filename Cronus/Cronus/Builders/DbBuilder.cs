@@ -14,6 +14,12 @@ public class DbBuilder : IBuilder<Database.Database>
         return new DbBuilder();
     }
 
+    public DbBuilder AddConnectionString(string connectionString)
+    {
+        _database.Config.AddConnectionString(connectionString);
+        return this;
+    }
+
     public DbBuilder AddTable(Type table)
     {
         var tableProp = new TypeAttributeHelper(table);
@@ -47,6 +53,7 @@ public class DbBuilder : IBuilder<Database.Database>
         }
 
         bool hasPrimaryKey = false;
+
         foreach (var column in columns)
         {
             if (column.IsPrimaryKey) { hasPrimaryKey = true; break; }
@@ -61,12 +68,6 @@ public class DbBuilder : IBuilder<Database.Database>
             Columns = columns,
         });
 
-        return this;
-    }
-
-    public DbBuilder AddConnectionString(string connectionString)
-    {
-        _database.Config.ConnectionString = connectionString;
         return this;
     }
 
