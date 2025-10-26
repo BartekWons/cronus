@@ -55,7 +55,7 @@ public class DbBuilder : IBuilder<Database.Database>
         if (!hasPrimaryKey)
             throw new AttributeNotFoundException("Table must contain Primary Key attribute");
 
-        _database.Model.Tables.Add(new TableModel
+        _database.Model.TablesSchema.Add(new TableModel
         {
             Name = tableName,
             Columns = columns,

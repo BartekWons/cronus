@@ -22,7 +22,7 @@ internal class DatabaseModelFileHandler : IFileReader<DatabaseModel>, IFileSaver
     {
         if (!Directory.Exists("DB"))
             Directory.CreateDirectory("DB");
-        var json = JsonConvert.SerializeObject(_model.Tables, Formatting.Indented);
+        var json = JsonConvert.SerializeObject(_model.TablesSchema, Formatting.Indented);
         var path = Path.Combine("DB", Path.ChangeExtension(filename, ".json"));
         await File.WriteAllTextAsync(path, json);
     }
