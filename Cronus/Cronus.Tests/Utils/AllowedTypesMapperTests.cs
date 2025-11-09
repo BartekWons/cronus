@@ -1,8 +1,8 @@
 ﻿using Cronus.Utils;
-using FluentAssertions;
 using NUnit.Framework;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Cronus.Mappers.Tests
+namespace Cronus.Tests.Utils
 {
     [TestFixture()]
     public class AllowedTypesMapperTests
@@ -16,7 +16,7 @@ namespace Cronus.Mappers.Tests
         public void MapTest_AllowedTypesCasting(Type type, AllowedType expectedType)
         {
             var mapper = new AllowedTypeMapper();
-            mapper.Map(type).Should().Be(expectedType);
+            Assert.That(mapper.Map(type), Is.EqualTo(expectedType));
 
         }
 
@@ -29,7 +29,7 @@ namespace Cronus.Mappers.Tests
         {
             var mapper = new AllowedTypeMapper();
             var act = () => mapper.Map(type);
-            act.Should().Throw<NotSupportedException>();
+            Assert.That(() => mapper.Map(type), Throws.TypeOf<NotSupportedException>());
         }
 
         [TestCase("String", AllowedType.String)]
@@ -40,10 +40,12 @@ namespace Cronus.Mappers.Tests
         [TestCase("boolean", AllowedType.Boolean)]
         [TestCase("integer", AllowedType.Integer)]
         [TestCase("double", AllowedType.Double)]
+        [TestCase("bool", AllowedType.Boolean)]
+        [TestCase("Bool", AllowedType.Boolean)]
         public void MapFromStringTest_ValidType(string type, AllowedType expectedType)
         {
             var mapper = new AllowedTypeMapper();
-            mapper.MapFromString(type).Should().Be(expectedType);
+            Assert.That(mapper.MapFromString(type), Is.EqualTo(expectedType));
         }
 
         [TestCase("Decimal")]
@@ -53,15 +55,7 @@ namespace Cronus.Mappers.Tests
         {
             var mapper = new AllowedTypeMapper();
             var act = () => mapper.MapFromString(type);
-            act.Should().Throw<NotSupportedException>();
-        }
-
-        [Test()]
-        public void MapFromStringTest_BoolType()
-        {
-            var mapper = new AllowedTypeMapper();
-            var act = () => mapper.MapFromString("bool");
-            act.Should().Throw<NotSupportedException>().WithMessage("Type bool is not supported, use Boolean instead");
+            Assert.That(() => mapper.MapFromString(type), Throws.TypeOf<NotSupportedException>());
         }
     }
 }

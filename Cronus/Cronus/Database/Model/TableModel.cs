@@ -9,4 +9,6 @@ internal class TableModel
     internal string Name { get; set; } = default!;
     [JsonProperty]
     internal List<ColumnModel>? Columns { get; set; }
+    [JsonProperty]
+    internal List<ForeignKeyModel> ForeignKeys { get; set; } = [];
 }

@@ -26,7 +26,7 @@ internal class AllowedTypeMapper : IMapper<AllowedType, Type>
             "integer" => AllowedType.Integer,
             "double" => AllowedType.Double,
             "boolean" => AllowedType.Boolean,
-            "bool" => throw new NotSupportedException("Type bool is not supported, use Boolean instead"),
+            "bool" => AllowedType.Boolean,
             _ => throw new NotSupportedException($"Type {type} not supported")
         };
     }

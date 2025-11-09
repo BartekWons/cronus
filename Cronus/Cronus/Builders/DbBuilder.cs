@@ -14,12 +14,23 @@ public class DbBuilder : IBuilder<Database.Database>
         return new DbBuilder();
     }
 
+    public DbBuilder AddConnectionString(string connectionString)
+    {
+        _database.Config.AddConnectionString(connectionString);
+        return this;
+    }
+
     public DbBuilder AddTable(Type table)
     {
         var tableProp = new TypeAttributeHelper(table);
         var tableName = tableProp.GetTableName();
 
-        var columns = new List<ColumnModel>();
+        var tableModel = new TableModel
+        {
+            Name = tableName,
+            Columns = [],
+            ForeignKeys = [],
+        };
 
         foreach (var prop in table.GetProperties())
         {
@@ -36,46 +47,61 @@ public class DbBuilder : IBuilder<Database.Database>
                 throw new AttributeNotFoundException("Primary Key is not an integer");
             }
 
-            var type = helper.GetPropertyType();
+            var propType = helper.GetPropertyType();
 
-            columns.Add(new ColumnModel
+            tableModel.Columns.Add(new ColumnModel
             {
                 Name = columnName,
                 IsPrimaryKey = isPrimaryKey,
-                Type = type,
+                Type = propType,
             });
+
+            var joinAttr = helper.GetJoinColumn();
+
+            if (joinAttr is not null)
+            {
+                string fkColumn = joinAttr.Name ?? prop.Name;
+
+                var baseName = fkColumn.EndsWith("Id") ? fkColumn.Substring(0, fkColumn.Length - 2) : fkColumn;
+
+                var referencedTable = baseName + "s";
+
+                var referencedColumn = fkColumn;
+
+                tableModel.ForeignKeys.Add(new ForeignKeyModel
+                {
+                    Column = fkColumn,
+                    ReferencedTable = referencedTable,
+                    ReferencedColumn = referencedColumn,
+                    CascadeDelete = true,
+                });
+            }
         }
 
-        bool hasPrimaryKey = false;
-        foreach (var column in columns)
+        if (!tableModel.Columns.Any(col => col.IsPrimaryKey == true))
         {
-            if (column.IsPrimaryKey) { hasPrimaryKey = true; break; }
-        }
-
-        if (!hasPrimaryKey)
             throw new AttributeNotFoundException("Table must contain Primary Key attribute");
+        }
 
-        _database.Model.Tables.Add(new TableModel
+        _database.Model.TablesSchema.Add(tableModel);
+
+        // create empty list of data for this table
+        if (!_database.Model.Data.ContainsKey(tableName))
         {
-            Name = tableName,
-            Columns = columns,
-        });
+            _database.Model.Data[tableName] = [];
+        }
 
-        return this;
-    }
-
-    public DbBuilder AddConnectionString(string connectionString)
-    {
-        _database.Config.ConnectionString = connectionString;
         return this;
     }
 
     public async Task<Database.Database> Build()
     {
-        if (String.IsNullOrEmpty(_database.Config.ConnectionString))
+        if (string.IsNullOrEmpty(_database.Config.ConnectionString))
             throw new InvalidConnectionStringException("Connection string is null or empty");
+
         var handler = new DatabaseModelFileHandler(_database.Model);
         await handler.SaveAsync(_database.Config.ConnectionString);
-            return _database;
+
+        return _database;
     }
 }

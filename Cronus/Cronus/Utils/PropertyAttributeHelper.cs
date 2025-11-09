@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using Cronus.Attributes;
+using System.Reflection;
 using CronusAttributes = Cronus.Attributes;
 
 namespace Cronus.Utils;
@@ -40,5 +41,10 @@ public class PropertyAttributeHelper
         var temp = _property.PropertyType;
         var mapper = new AllowedTypeMapper();
         return mapper.Map(temp).ToString();
+    }
+
+    internal JoinColumnAttribute? GetJoinColumn()
+    {
+        return _property.GetCustomAttribute<JoinColumnAttribute>();
     }
 }
