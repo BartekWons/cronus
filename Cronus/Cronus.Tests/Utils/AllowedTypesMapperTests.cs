@@ -1,6 +1,6 @@
 ﻿using Cronus.Utils;
-using FluentAssertions;
 using NUnit.Framework;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cronus.Tests.Utils
 {
@@ -16,7 +16,7 @@ namespace Cronus.Tests.Utils
         public void MapTest_AllowedTypesCasting(Type type, AllowedType expectedType)
         {
             var mapper = new AllowedTypeMapper();
-            mapper.Map(type).Should().Be(expectedType);
+            Assert.That(mapper.Map(type), Is.EqualTo(expectedType));
 
         }
 
@@ -29,7 +29,7 @@ namespace Cronus.Tests.Utils
         {
             var mapper = new AllowedTypeMapper();
             var act = () => mapper.Map(type);
-            act.Should().Throw<NotSupportedException>();
+            Assert.That(() => mapper.Map(type), Throws.TypeOf<NotSupportedException>());
         }
 
         [TestCase("String", AllowedType.String)]
@@ -45,7 +45,7 @@ namespace Cronus.Tests.Utils
         public void MapFromStringTest_ValidType(string type, AllowedType expectedType)
         {
             var mapper = new AllowedTypeMapper();
-            mapper.MapFromString(type).Should().Be(expectedType);
+            Assert.That(mapper.MapFromString(type), Is.EqualTo(expectedType));
         }
 
         [TestCase("Decimal")]
@@ -55,7 +55,7 @@ namespace Cronus.Tests.Utils
         {
             var mapper = new AllowedTypeMapper();
             var act = () => mapper.MapFromString(type);
-            act.Should().Throw<NotSupportedException>();
+            Assert.That(() => mapper.MapFromString(type), Throws.TypeOf<NotSupportedException>());
         }
     }
 }

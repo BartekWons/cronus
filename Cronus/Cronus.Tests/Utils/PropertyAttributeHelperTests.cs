@@ -1,6 +1,5 @@
 ﻿using Cronus.Tests.TestModels;
 using Cronus.Utils;
-using FluentAssertions;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using System.Reflection;
@@ -20,7 +19,7 @@ namespace Cronus.Tests.Utils
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.ValidPrimaryKey));
             var helper = new PropertyAttributeHelper(prop);
-            helper.Invoking(h => h.IsPrimaryKeyInteger()).Should().NotThrow();
+            Assert.That(() => helper.IsPrimaryKeyInteger(), Throws.Nothing);
         }
 
         [Test]
@@ -28,7 +27,7 @@ namespace Cronus.Tests.Utils
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.ValidPrimaryKey));
             var helper = new PropertyAttributeHelper(prop);
-            helper.IsPrimaryKey().Should().BeTrue();
+            Assert.That(helper.IsPrimaryKey(), Is.True);
         }
 
         [Test]
@@ -36,7 +35,7 @@ namespace Cronus.Tests.Utils
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.IgnoredProperty));
             var helper = new PropertyAttributeHelper(prop);
-            helper.IsPrimaryKey().Should().BeFalse();
+            Assert.That(helper.IsPrimaryKey(), Is.False);
         }
 
         [Test]
@@ -44,7 +43,7 @@ namespace Cronus.Tests.Utils
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.InvalidPrimaryKey));
             var helper = new PropertyAttributeHelper(prop);
-            helper.IsPrimaryKeyInteger().Should().BeFalse();
+            Assert.That(helper.IsPrimaryKeyInteger(), Is.False);
         }
 
         [Test]
@@ -52,7 +51,7 @@ namespace Cronus.Tests.Utils
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.IgnoredProperty));
             var helper = new PropertyAttributeHelper(prop);
-            helper.IsNotMapped().Should().BeTrue();
+            Assert.That(helper.IsNotMapped(), Is.True);
         }
 
         [Test]
@@ -60,7 +59,7 @@ namespace Cronus.Tests.Utils
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.ColumnName));
             var helper = new PropertyAttributeHelper(prop);
-            helper.GetColumnName().Should().Be(nameof(AttributeHelperTestModel.ColumnName));
+            Assert.That(helper.GetColumnName(), Is.EqualTo(nameof(AttributeHelperTestModel.ColumnName)));
         }
 
         [Test]
@@ -68,7 +67,7 @@ namespace Cronus.Tests.Utils
         {
             var prop = GetProperty(nameof(AttributeHelperTestModel.ColumnWithCustomName));
             var helper = new PropertyAttributeHelper(prop);
-            helper.GetColumnName().Should().Be("custom_column");
+            Assert.That(helper.GetColumnName(), Is.EqualTo("custom_column"));
         }
     }
 }

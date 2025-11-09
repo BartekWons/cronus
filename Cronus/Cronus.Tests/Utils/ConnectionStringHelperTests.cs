@@ -1,5 +1,4 @@
 ﻿using Cronus.Utils;
-using FluentAssertions;
 using NUnit.Framework;
 
 namespace Cronus.Tests.Utils;
@@ -13,7 +12,7 @@ public class ConnectionStringHelperTests
     public void IsValidTest_ReturnsTrue(string connectionString)
     {
         var handler = new ConnectionStringHandler(connectionString);
-        handler.IsValid().Should().BeTrue();
+        Assert.That(handler.IsValid(), Is.True);
     }
 
     [TestCase("")]
@@ -24,23 +23,21 @@ public class ConnectionStringHelperTests
     public void IsValidTest_ReturnsFalse(string connectionString)
     {
         var handler = new ConnectionStringHandler(connectionString);
-        handler.IsValid().Should().BeFalse();
+        Assert.That(handler.IsValid(), Is.False);
     }
 
     [TestCase(null)]
     public void IsValidTest_ThrowsException(string connectionString)
     {
         var handler = new ConnectionStringHandler(connectionString);
-        var act = () => handler.IsValid().Should();
-        act.Should().Throw<ArgumentNullException>();
+        Assert.That(() => handler.IsValid(), Throws.TypeOf<ArgumentNullException>());
     }
 
     [Test()]
     public void GetDatabaseNameTest()
     {
         var handler = new ConnectionStringHandler("group_id");
-        var name = handler.GetDatabaseName();
-        name.Should().Be("group");
+        Assert.That(handler.GetDatabaseName(), Is.EqualTo("group"));
     }
 
     [Test()]
@@ -48,6 +45,6 @@ public class ConnectionStringHelperTests
     {
         var handler = new ConnectionStringHandler("group_id");
         var name = handler.GetDatabaseId();
-        name.Should().Be("id");
+        Assert.That(handler.GetDatabaseId(), Is.EqualTo("id"));
     }
 }

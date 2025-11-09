@@ -1,8 +1,6 @@
 ﻿using Cronus.Exceptions;
 using Cronus.Tests.TestModels;
 using Cronus.Utils;
-using FluentAssertions;
-using NUnit.Framework;
 
 namespace Cronus.Tests.Utils
 {
@@ -14,7 +12,7 @@ namespace Cronus.Tests.Utils
         {
             var obj = new TypeAttributeTestModel.WithoutTableAttribute();
             var tableProp = new TypeAttributeHelper(obj.GetType());
-            tableProp.Invoking(p => p.GetTableName()).Should().Throw<AttributeNotFoundException>();
+            Assert.That(() => tableProp.GetTableName(), Throws.TypeOf<AttributeNotFoundException>());
         }
 
         [Test]
@@ -22,7 +20,7 @@ namespace Cronus.Tests.Utils
         {
             var obj = new TypeAttributeTestModel.WithTableAttribute();
             var tableProp = new TypeAttributeHelper(obj.GetType());
-            tableProp.GetTableName().Should().Be("With_Table_Attribute");
+            Assert.That(tableProp.GetTableName(), Is.EqualTo("With_Table_Attribute"));
         }
     }
 }
