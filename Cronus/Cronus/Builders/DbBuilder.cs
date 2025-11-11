@@ -99,8 +99,17 @@ public class DbBuilder : IBuilder<Database.Database>
         if (string.IsNullOrEmpty(_database.Config.ConnectionString))
             throw new InvalidConnectionStringException("Connection string is null or empty");
 
-        var handler = new DatabaseModelFileHandler(_database.Model);
-        await handler.SaveAsync(_database.Config.ConnectionString);
+        var path = Path.Combine("DB", Path.ChangeExtension(_database.Config.ConnectionString, ".json"));
+        var loader = new DatabaseModelFileHandler(_database.Model);
+
+        if (File.Exists(path))
+        {
+            _database.Model = await loader.ReadAsync(_database.Config.ConnectionString);
+        }
+        else
+        {
+            await loader.SaveAsync(_database.Config.ConnectionString);
+        }
 
         return _database;
     }
