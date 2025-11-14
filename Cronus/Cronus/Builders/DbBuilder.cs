@@ -4,9 +4,9 @@ using Cronus.Utils;
 
 namespace Cronus.Builders;
 
-public class DbBuilder : IBuilder<Database.Database>
+public class DbBuilder : IBuilder
 {
-    private Database.Database _database = new();
+    private Database _database = new();
     private DbBuilder() { }
 
     public static DbBuilder CreateBuilder()
@@ -94,7 +94,7 @@ public class DbBuilder : IBuilder<Database.Database>
         return this;
     }
 
-    public async Task<Database.Database> Build()
+    private async Task<Database> Build()
     {
         if (string.IsNullOrEmpty(_database.Config.ConnectionString))
             throw new InvalidConnectionStringException("Connection string is null or empty");
