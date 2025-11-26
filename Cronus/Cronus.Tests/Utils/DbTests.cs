@@ -17,7 +17,7 @@ namespace Cronus.Tests.Utils
                 Name = nameof(DbTestModel),
             });
             var db = new Db(database);
-            var result = db.Set<DbTestModel>();
+            var result = db.GetTable<DbTestModel>();
             Assert.That(result, Is.InstanceOf<DbSet<DbTestModel>>());
         }
     }
