@@ -4,8 +4,6 @@ using Cronus.Interfaces;
 using Cronus.Parser;
 using Cronus.Utils;
 using System.Data;
-using System.Data.Common;
-using System.Diagnostics;
 
 namespace Cronus.Runtime
 {

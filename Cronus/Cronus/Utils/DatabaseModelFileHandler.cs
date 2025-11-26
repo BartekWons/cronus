@@ -1,4 +1,4 @@
-﻿using Cronus.Database.Model;
+﻿using Cronus.DataAccess.Model;
 using Cronus.Interfaces;
 using Newtonsoft.Json;
 

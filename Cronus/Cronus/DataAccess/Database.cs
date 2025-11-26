@@ -1,6 +1,6 @@
 ﻿using Cronus.DataAccess.Model;
 
-namespace Cronus.Database;
+namespace Cronus.DataAccess;
 
 public class Database
 {

@@ -1,5 +1,7 @@
-﻿using Cronus.Database.Model;
+﻿using Cronus.DataAccess;
+using Cronus.DataAccess.Model;
 using Cronus.Exceptions;
+using Cronus.Runtime;
 using Cronus.Utils;
 
 namespace Cronus.Builders;
@@ -92,6 +94,12 @@ public class DbBuilder : IBuilder
         }
 
         return this;
+    }
+
+    public async Task<Db> BuildRuntimeAsync()
+    {
+        var db = await Build();
+        return new Db(db);
     }
 
     private async Task<Database> Build()

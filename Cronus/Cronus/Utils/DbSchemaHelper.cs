@@ -1,6 +1,5 @@
 ﻿using Cronus.DataAccess;
 using Cronus.DataAccess.Model;
-using System.Net.Http.Headers;
 
 namespace Cronus.Utils
 {
