@@ -1,12 +1,14 @@
-﻿using Cronus.Database.Model;
+﻿using Cronus.DataAccess;
+using Cronus.DataAccess.Model;
 using Cronus.Exceptions;
+using Cronus.Runtime;
 using Cronus.Utils;
 
 namespace Cronus.Builders;
 
-public class DbBuilder : IBuilder<Database.Database>
+public class DbBuilder : IBuilder
 {
-    private Database.Database _database = new();
+    private Database _database = new();
     private DbBuilder() { }
 
     public static DbBuilder CreateBuilder()
@@ -94,13 +96,28 @@ public class DbBuilder : IBuilder<Database.Database>
         return this;
     }
 
-    public async Task<Database.Database> Build()
+    public async Task<Db> BuildRuntimeAsync()
+    {
+        var db = await Build();
+        return new Db(db);
+    }
+
+    private async Task<Database> Build()
     {
         if (string.IsNullOrEmpty(_database.Config.ConnectionString))
             throw new InvalidConnectionStringException("Connection string is null or empty");
 
-        var handler = new DatabaseModelFileHandler(_database.Model);
-        await handler.SaveAsync(_database.Config.ConnectionString);
+        var path = Path.Combine("DB", Path.ChangeExtension(_database.Config.ConnectionString, ".json"));
+        var loader = new DatabaseModelFileHandler(_database.Model);
+
+        if (File.Exists(path))
+        {
+            _database.Model = await loader.ReadAsync(_database.Config.ConnectionString);
+        }
+        else
+        {
+            await loader.SaveAsync(_database.Config.ConnectionString);
+        }
 
         return _database;
     }

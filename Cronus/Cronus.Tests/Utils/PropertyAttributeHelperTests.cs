@@ -1,4 +1,5 @@
-﻿using Cronus.Tests.TestModels;
+﻿using Cronus.Attributes;
+using Cronus.Tests.TestModels;
 using Cronus.Utils;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -68,6 +69,32 @@ namespace Cronus.Tests.Utils
             var prop = GetProperty(nameof(AttributeHelperTestModel.ColumnWithCustomName));
             var helper = new PropertyAttributeHelper(prop);
             Assert.That(helper.GetColumnName(), Is.EqualTo("custom_column"));
+        }
+
+        [Test]
+        public void GetPropertyType_ReturnsExpectedResult()
+        {
+            var prop = GetProperty(nameof(AttributeHelperTestModel.RegularProperty));
+            var helper = new PropertyAttributeHelper(prop);
+            Assert.That(helper.GetPropertyType(), Is.EqualTo("String"));
+        }
+
+        [Test]
+        public void GetJoinColumn_ReturnsJoinColumnObject()
+        {
+            var prop = GetProperty(nameof(AttributeHelperTestModel.JoinColumnId));
+            var helper = new PropertyAttributeHelper(prop);
+            var result = helper.GetJoinColumn();
+            Assert.That(result, Is.InstanceOf<JoinColumnAttribute>());
+        }
+
+        [Test]
+        public void GetJoinColumn_ReturnsNull()
+        {
+            var prop = GetProperty(nameof(AttributeHelperTestModel.RegularProperty));
+            var helper = new PropertyAttributeHelper(prop);
+            var result = helper.GetJoinColumn();
+            Assert.That(result, Is.Null);
         }
     }
 }

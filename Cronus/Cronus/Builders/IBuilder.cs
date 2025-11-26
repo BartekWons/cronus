@@ -1,6 +1,8 @@
-﻿namespace Cronus.Builders;
+﻿using Cronus.Runtime;
 
-public interface IBuilder<T> where T : class
+namespace Cronus.Builders;
+
+public interface IBuilder
 {
-    Task<T> Build();
+    Task<Db> BuildRuntimeAsync();
 }

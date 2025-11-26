@@ -25,5 +25,8 @@ namespace Cronus.Tests.TestModels
         public string ColumnWithCustomName { get; set; }
 
         public string RegularProperty { get; set; }
+
+        [JoinColumn("JoinColumnTest")]
+        public int JoinColumnId { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Cronus.Database.Model;
+﻿using Cronus.DataAccess.Model;
 using Cronus.Interfaces;
 using Newtonsoft.Json;
 
@@ -13,7 +13,7 @@ internal class DatabaseModelFileHandler : IFileReader<DatabaseModel>, IFileSaver
         _model = model;
     }
 
-    public DatabaseModel Read(string filename)
+    public async Task<DatabaseModel> ReadAsync(string filename)
     {
         var path = GetPath(filename);
 
@@ -22,7 +22,7 @@ internal class DatabaseModelFileHandler : IFileReader<DatabaseModel>, IFileSaver
             throw new FileNotFoundException($"Path not found: {path}");
         }
 
-        var content = File.ReadAllText(path);
+        var content = await File.ReadAllTextAsync(path);
         var model = JsonConvert.DeserializeObject<DatabaseModel>(content);
         
         if (model is null)
@@ -40,7 +40,7 @@ internal class DatabaseModelFileHandler : IFileReader<DatabaseModel>, IFileSaver
             Directory.CreateDirectory("DB");
         }
 
-        var json = JsonConvert.SerializeObject(_model.TablesSchema, Formatting.Indented);
+        var json = JsonConvert.SerializeObject(_model, Formatting.Indented);
         var path = GetPath(filename);
 
         await File.WriteAllTextAsync(path, json);

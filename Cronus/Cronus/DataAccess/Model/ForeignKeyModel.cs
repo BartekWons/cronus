@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Cronus.Database.Model;
+namespace Cronus.DataAccess.Model;
 
 [JsonObject(MemberSerialization.OptIn)]
 internal class ForeignKeyModel

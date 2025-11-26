@@ -1,7 +1,7 @@
 ﻿using Cronus.Exceptions;
 using Cronus.Utils;
 
-namespace Cronus.Database;
+namespace Cronus.DataAccess;
 
 internal class DatabaseConfig
 {
