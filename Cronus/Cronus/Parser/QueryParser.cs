@@ -1,6 +1,7 @@
 ﻿using Cronus.Interfaces;
 using Cronus.Parser.Queries;
 using Sprache;
+using System.Globalization;
 
 namespace Cronus.Parser
 {
@@ -16,7 +17,7 @@ namespace Cronus.Parser
         private static readonly Parser<string> _stringLiteral =
             from leading in Parse.WhiteSpace.Many()
             from open in Parse.Char('"')
-            from text in Parse.LetterOrDigit.Many().Text()
+            from text in Parse.CharExcept('"').Many().Text()
             from close in Parse.Char('"')
             from trailing in Parse.WhiteSpace.Many()
             select text;
@@ -27,11 +28,23 @@ namespace Cronus.Parser
             from trailing in Parse.WhiteSpace.Many()
             select int.Parse(digits);
 
+        private static readonly Parser<double> _doubleLiteral = 
+            from leading in Parse.WhiteSpace.Many()
+            from doubleNumber in Parse.DecimalInvariant.Token()
+            from trailing in Parse.WhiteSpace.Many()
+            select double.Parse(doubleNumber, CultureInfo.InvariantCulture);
+
+        private static readonly Parser<bool> _boolLiteral = 
+            Parse.IgnoreCase("true").Token().Return(true)
+            .Or(Parse.IgnoreCase("false").Token().Return(false));
+
         private static readonly Parser<object?> _literalValue =
             _stringLiteral.Select(v => (object?)v)
+            .Or(_boolLiteral.Select(v => (object?)v))
+            .Or(_doubleLiteral.Select(v => (object?)v))
             .Or(_intLiteral.Select(v => (object?)v));
 
-        private static Parser<object?> KeyWord(string text)
+        private static Parser<string> KeyWord(string text)
         {
             return from leading in Parse.WhiteSpace.Many()
             from word in Parse.IgnoreCase(text).Text()

@@ -7,11 +7,11 @@ using System.Data;
 
 namespace Cronus.Runtime
 {
-    internal class DatabaseAdapter : IDatabaseAdapter
+    internal class DbAdapter : IDbAdapter
     {
         private readonly Database _db;
         private readonly DbSchemaHelper _schemaHelper;
-        public DatabaseAdapter(Database db)
+        public DbAdapter(Database db)
         {
             _db = db;
             _schemaHelper = new DbSchemaHelper(db);
@@ -35,7 +35,7 @@ namespace Cronus.Runtime
             return Task.FromResult(totalRemoved);
         }
 
-        public Task InsertAsync(string table, IReadOnlyDictionary<string, object>? values)
+        public Task<bool> InsertAsync(string table, IReadOnlyDictionary<string, object>? values)
         {
             if (values is null)
             {
@@ -63,9 +63,32 @@ namespace Cronus.Runtime
                 row[col.Name] = v;
             }
 
+            var pkName = _schemaHelper.GetPrimaryKeyName(table);
+
+            if (row.TryGetValue(pkName, out var pkValue) && pkValue is null)
+            {
+                int nextPk = 1;
+
+                if (rows.Any())
+                {
+                    nextPk = rows
+                        .Where(r => r.TryGetValue(pkName, out var v) && v is not null)
+                        .Select(r => Convert.ToInt32(r[pkName]))
+                        .DefaultIfEmpty(0)
+                        .Max() + 1;
+                }
+                row[pkName] = nextPk;
+                pkValue = nextPk;
+            }
+
+            if (rows.Any(r => r.TryGetValue(pkName, out var existing) && KeyEqual(existing, pkValue)))
+            {
+                return Task.FromResult(false);
+            }
+
             rows.Add(row);
 
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
 
         public Task<IReadOnlyList<IDictionary<string, object?>>> SelectAsync(string table, IReadOnlyList<string> columns, ICondition? whereCondition)
@@ -189,6 +212,28 @@ namespace Cronus.Runtime
             }
 
             return removed;
+        }
+
+        private static bool KeyEqual(object? a, object? b)
+        {
+            if (a is null && b is null) return true;
+            if (a is null || b is null) return false;
+
+            if (a is IConvertible && b is IConvertible)
+            {
+                try
+                {
+                    var da = Convert.ToInt64(a);
+                    var db = Convert.ToInt64(b);
+                    return da == db;
+                }
+                catch
+                {
+
+                }
+            }
+
+            return a.Equals(b);
         }
     }
 }

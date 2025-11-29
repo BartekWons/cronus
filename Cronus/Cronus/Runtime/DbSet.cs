@@ -2,6 +2,7 @@
 using Cronus.DataAccess.Model;
 using Cronus.Utils;
 using System.Linq.Expressions;
+using System.Xml.Linq;
 
 namespace Cronus.Runtime
 {
@@ -39,12 +40,32 @@ namespace Cronus.Runtime
 
         public bool Insert(T entity)
         {
-            var row = EntityMapper.ToRow(entity);
-
             var pkProperty = EntityMapper.GetPrimaryKey<T>();
             var pkHelper = new PropertyAttributeHelper(pkProperty);
             var pkColumnName = pkHelper.GetColumnName();
             var pkValue = pkProperty.GetValue(entity);
+
+            bool IsPkEmpty =
+                pkValue is null ||
+                (pkValue is int i && i == 0) ||
+                (pkValue is long l && l == 0L);
+
+            if(IsPkEmpty)
+            {
+                int nextPk = 1;
+
+                if (Rows.Any())
+                {
+                    nextPk = Rows
+                        .Where(r => r.TryGetValue(pkColumnName, out var v) && v is not null)
+                        .Select(r => Convert.ToInt32(r[pkColumnName]))
+                        .DefaultIfEmpty(0)
+                        .Max() + 1;
+                }
+
+                pkProperty.SetValue(entity, nextPk);
+                pkValue = nextPk;
+            }
 
             if (pkValue is not null)
             {
@@ -57,6 +78,7 @@ namespace Cronus.Runtime
                 }
             }
 
+            var row = EntityMapper.ToRow(entity);
             Rows.Add(row);
             return true;
         }

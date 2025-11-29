@@ -16,7 +16,7 @@ namespace Cronus.Runtime
             _db = db;
             _fileHandler = new DatabaseModelLoader(_db.Model);
 
-            var adapter = new DatabaseAdapter(_db);
+            var adapter = new DbAdapter(_db);
             _sqlExecutor = new SqlQueryExecutor(adapter);
         }
 
