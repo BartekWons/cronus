@@ -8,13 +8,13 @@ namespace Cronus.Runtime
     public class Db
     {
         private readonly Database _db;
-        private readonly DatabaseModelFileHandler _fileHandler;
+        private readonly DatabaseModelLoader _fileHandler;
         private readonly ISqlQueryExecutor _sqlExecutor;
 
         internal Db(Database db)
         {
             _db = db;
-            _fileHandler = new DatabaseModelFileHandler(_db.Model);
+            _fileHandler = new DatabaseModelLoader(_db.Model);
 
             var adapter = new DatabaseAdapter(_db);
             _sqlExecutor = new SqlQueryExecutor(adapter);

@@ -1,5 +1,6 @@
 ﻿using Cronus.DataAccess;
 using Cronus.DataAccess.Model;
+using Cronus.Utils;
 using System.Linq.Expressions;
 
 namespace Cronus.Runtime
@@ -36,19 +37,38 @@ namespace Cronus.Runtime
             return query;
         }
 
-        public void Insert(T entity)
+        public bool Insert(T entity)
         {
             var row = EntityMapper.ToRow(entity);
+
+            var pkProperty = EntityMapper.GetPrimaryKey<T>();
+            var pkHelper = new PropertyAttributeHelper(pkProperty);
+            var pkColumnName = pkHelper.GetColumnName();
+            var pkValue = pkProperty.GetValue(entity);
+
+            if (pkValue is not null)
+            {
+                var exists = Rows.Any(r => 
+                r.TryGetValue(pkColumnName, out var existing) && KeyEqual(existing, pkValue));
+
+                if (exists)
+                {
+                    return false;
+                }
+            }
+
             Rows.Add(row);
+            return true;
         }
 
         public bool Update(T entity) 
         {
             var pkProperty = EntityMapper.GetPrimaryKey<T>();
-            var pkName = pkProperty.Name;
+            var pkHelper = new PropertyAttributeHelper(pkProperty);
+            var pkColumnName = pkHelper.GetColumnName();
             var pkValue = pkProperty.GetValue(entity);
 
-            var existingRecord = Rows.FirstOrDefault(r => r.TryGetValue(pkName, out var value) && Equals(value, pkValue));
+            var existingRecord = Rows.FirstOrDefault(r => r.TryGetValue(pkColumnName, out var value) && Equals(value, pkValue));
 
             if (existingRecord is not null) return false;
 
@@ -176,6 +196,28 @@ namespace Cronus.Runtime
             }
 
             return removed;
+        }
+
+        private static bool KeyEqual(object? a, object? b)
+        {
+            if (a is null && b is null) return true;
+            if (a is null || b is null) return false;
+
+            if (a is IConvertible && b is IConvertible)
+            {
+                try
+                {
+                    var da = Convert.ToInt64(a);
+                    var db = Convert.ToInt64(b);
+                    return da == db;
+                }
+                catch
+                {
+
+                }
+            }
+
+            return a.Equals(b);
         }
     }
 }

@@ -2,5 +2,5 @@
 
 internal interface IFileReader<T> where T : class
 {
-    Task<T> ReadAsync(string filename);
+    Task<T?> ReadAsync(string filename);
 }

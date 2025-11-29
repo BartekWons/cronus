@@ -4,16 +4,16 @@ using Newtonsoft.Json;
 
 namespace Cronus.Utils;
 
-internal class DatabaseModelFileHandler : IFileReader<DatabaseModel>, IFileSaver
+internal class DatabaseModelLoader : IFileReader<DatabaseModel>, IFileSaver
 {
     private DatabaseModel _model;
 
-    internal DatabaseModelFileHandler(DatabaseModel model)
+    internal DatabaseModelLoader(DatabaseModel model)
     {
         _model = model;
     }
 
-    public async Task<DatabaseModel> ReadAsync(string filename)
+    public async Task<DatabaseModel?> ReadAsync(string filename)
     {
         var path = GetPath(filename);
 
@@ -23,14 +23,21 @@ internal class DatabaseModelFileHandler : IFileReader<DatabaseModel>, IFileSaver
         }
 
         var content = await File.ReadAllTextAsync(path);
-        var model = JsonConvert.DeserializeObject<DatabaseModel>(content);
-        
-        if (model is null)
+
+        if (string.IsNullOrWhiteSpace(content))
         {
-            throw new InvalidDataException("Deserialization failed");
+            return null;
         }
 
-        return model;
+        try
+        {
+            var model = JsonConvert.DeserializeObject<DatabaseModel>(content);
+            return model;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
     }
 
     public async Task SaveAsync(string filename)
