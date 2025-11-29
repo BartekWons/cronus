@@ -163,17 +163,45 @@ namespace Cronus.Runtime
                 return true;
             }
 
-            if (where is BinaryCondition bc)
+            if (where is not BinaryCondition)
             {
-                if (!row.TryGetValue(bc.Left, out var value))
-                {
-                    return false;
-                }
-
-                return Equals(value, bc.Right);
+                throw new NotSupportedException("Only simple binary conditions are supported");
             }
 
-            throw new NotSupportedException("Only simple binary conditions are supported");
+            var bc = where as BinaryCondition;
+
+            if (!row.TryGetValue(bc.Left, out var value))
+                return false;
+
+            switch (bc.Operator)
+            {
+                case "=":
+                    return KeyEqual(value, bc.Right);
+                case "!=":
+                    return !KeyEqual(value, bc.Right);
+                case "<":
+                    return Compare(value, bc.Right) < 0;
+                case ">":
+                    return Compare(value, bc.Right) > 0;
+                case "<=":
+                    return Compare(value, bc.Right) <= 0;
+                case ">=":
+                    return Compare(value, bc.Right) >= 0;
+                default:
+                    throw new NotSupportedException("Not supported condition");
+            }
+        }
+
+        private static int Compare(object? a, object? b)
+        {
+            if (a is IConvertible && b is IConvertible)
+            {
+                var da = Convert.ToDouble(a);
+                var db = Convert.ToDouble(b);
+                return da.CompareTo(db);
+            }
+
+            throw new InvalidOperationException("Cannot compare non-numeric values");
         }
 
         private int DeleteWithCascade(string table, IDictionary<string, object?> row)

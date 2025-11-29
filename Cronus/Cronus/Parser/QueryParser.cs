@@ -44,6 +44,14 @@ namespace Cronus.Parser
             .Or(_doubleLiteral.Select(v => (object?)v))
             .Or(_intLiteral.Select(v => (object?)v));
 
+        private static readonly Parser<string> _operator =
+            Parse.String("!=").Text()
+            .Or(Parse.String("<=").Text())
+            .Or(Parse.String(">=").Text())
+            .Or(Parse.String("<").Text())
+            .Or(Parse.String(">").Text())
+            .Or(Parse.String("=").Text());
+
         private static Parser<string> KeyWord(string text)
         {
             return from leading in Parse.WhiteSpace.Many()
@@ -54,7 +62,7 @@ namespace Cronus.Parser
 
         private static readonly Parser<ICondition> _simpleCondition =
             from column in _identifier
-            from @operator in Parse.Char('=').Token().Select(_ => "=")
+            from @operator in _operator
             from value in _literalValue
             select new BinaryCondition
             {
