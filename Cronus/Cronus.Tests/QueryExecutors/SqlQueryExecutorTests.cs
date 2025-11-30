@@ -8,8 +8,8 @@ namespace Cronus.Tests.QueryExecutors
     public class SqlQueryExecutorTests
     {
         [TestCase(@"SELECT * FROM Users")]
-        [TestCase(@"INSERT INTO Users (UserId, Name) VALUES (1, ""Tom"")")]
-        [TestCase(@"UPDATE Users SET Name = ""Tom"" WHERE UserId = 1")]
+        [TestCase(@"INSERT INTO Users (UserId, Name) VALUES (1, 'Tom')")]
+        [TestCase(@"UPDATE Users SET Name = 'Tom' WHERE UserId = 1")]
         [TestCase(@"DELETE FROM Users WHERE UserId = 1")]
         public async Task ExecuteAsync_ValidSql_ShouldNotThrow(string sql)
         {
@@ -43,8 +43,8 @@ namespace Cronus.Tests.QueryExecutors
         }
 
         [TestCase(@"SELECT FROM Users")]
-        [TestCase(@"INSERT Users VALUES (1, ""Tom"")")]
-        [TestCase(@"UPDATE SET Name = ""Tom""")]
+        [TestCase(@"INSERT Users VALUES (1, 'Tom')")]
+        [TestCase(@"UPDATE SET Name = 'Tom'")]
         [TestCase(@"DELETE Users WHERE Id = 1")]
         public void ExecuteAsync_InvalidSql_ShouldThrowInvalidOperationException(string sql)
         {
