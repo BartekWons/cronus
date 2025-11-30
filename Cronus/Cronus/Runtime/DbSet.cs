@@ -2,7 +2,6 @@
 using Cronus.DataAccess.Model;
 using Cronus.Utils;
 using System.Linq.Expressions;
-using System.Xml.Linq;
 
 namespace Cronus.Runtime
 {
@@ -90,18 +89,45 @@ namespace Cronus.Runtime
             var pkColumnName = pkHelper.GetColumnName();
             var pkValue = pkProperty.GetValue(entity);
 
-            var existingRecord = Rows.FirstOrDefault(r => r.TryGetValue(pkColumnName, out var value) && Equals(value, pkValue));
+            var existingRecord = Rows.FirstOrDefault(r => r.TryGetValue(pkColumnName, out var value) && KeyEqual(value, pkValue));
 
-            if (existingRecord is not null) return false;
+            if (existingRecord is null) 
+                return false;
 
             var updated = EntityMapper.ToRow(entity);
 
-            foreach (var key in updated.Keys.ToList())
+            foreach (var property in typeof(T).GetProperties())
             {
-                existingRecord[key] = updated[key];
+                var helper = new PropertyAttributeHelper(property);
+
+                if (helper.IsNotMapped())
+                {
+                    continue;
+                }
+
+                var columnName = helper.GetColumnName();
+
+                if (columnName == pkColumnName)
+                {
+                    continue;
+                }
+
+                var newValue = property.GetValue(entity);
+
+                if (Equals(newValue, GetDefault(property.PropertyType)))
+                {
+                    continue;
+                }
+
+                existingRecord[columnName] = newValue;
             }
 
             return true;  
+        }
+
+        private object? GetDefault(Type t)
+        {
+            return t.IsValueType ? Activator.CreateInstance(t) : null;
         }
 
         public int DeleteById(object id)

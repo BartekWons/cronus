@@ -16,9 +16,9 @@ namespace Cronus.Parser
 
         private static readonly Parser<string> _stringLiteral =
             from leading in Parse.WhiteSpace.Many()
-            from open in Parse.Char('"')
-            from text in Parse.CharExcept('"').Many().Text()
-            from close in Parse.Char('"')
+            from open in Parse.Char('\'')
+            from text in Parse.CharExcept('\'').Many().Text()
+            from close in Parse.Char('\'')
             from trailing in Parse.WhiteSpace.Many()
             select text;
 
