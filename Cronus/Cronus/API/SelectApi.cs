@@ -38,7 +38,7 @@ namespace Cronus.API
             {
                 var parentId = p.GetType().GetProperty(parentPkName)!.GetValue(p);
                 var children = childRows
-                    .Where(r => r.TryGetValue(mappedByFk, out var value) && Equals(value, parentId))
+                    .Where(r => r.TryGetValue(mappedByFk, out var value) && KeyEqual(value, parentId))
                     .Select(EntityMapper.FromRow<TChild>).ToList();
 
                 var propInfo = p.GetType().GetProperty(navProp.Name)!;
