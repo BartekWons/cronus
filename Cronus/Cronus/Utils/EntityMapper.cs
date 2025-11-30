@@ -1,7 +1,6 @@
-﻿using Cronus.Utils;
-using System.Reflection;
+﻿using System.Reflection;
 
-namespace Cronus.Runtime
+namespace Cronus.Utils
 {
     internal static class EntityMapper
     {

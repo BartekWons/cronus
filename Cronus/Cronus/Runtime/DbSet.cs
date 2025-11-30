@@ -94,8 +94,6 @@ namespace Cronus.Runtime
             if (existingRecord is null) 
                 return false;
 
-            var updated = EntityMapper.ToRow(entity);
-
             foreach (var property in typeof(T).GetProperties())
             {
                 var helper = new PropertyAttributeHelper(property);
@@ -130,21 +128,60 @@ namespace Cronus.Runtime
             return t.IsValueType ? Activator.CreateInstance(t) : null;
         }
 
-        public int DeleteById(object id)
+        public int Delete(Expression<Func<T, bool>> predicate)
         {
-            var pkName = EntityMapper.GetPrimaryKey<T>().Name;
-            var toRemove = Rows.Where(r => r.TryGetValue(pkName, out var value) && Equals(value, id)).ToList();
-            var count = toRemove.Count;
+            var compiled = predicate.Compile();
 
-            foreach (var child in _db.Model.TablesSchema)
+            var pkProperty = EntityMapper.GetPrimaryKey<T>();
+
+            var idsToDelete = Rows
+                .Select(EntityMapper.FromRow<T>)
+                .Where(compiled)
+                .Select(e => pkProperty.GetValue(e))
+                .ToList();
+
+            var total = 0;
+
+            foreach (var id in idsToDelete)
             {
-                foreach (var fk in child.ForeignKeys.Where(fk => fk.ReferencedTable == _table && fk.ReferencedColumn == pkName))
-                {
-                    count += DeleteChildren(child.Name, fk.Column, id);      
-                }            
+                total += DeleteById(id);
             }
 
-            return count;
+            return total;
+        }
+
+        public int DeleteById(object id)
+        {
+            var pkProperty = EntityMapper.GetPrimaryKey<T>();
+            var pkHelper = new PropertyAttributeHelper(pkProperty);
+            var pkColumnName = pkHelper.GetColumnName();
+
+            var toRemove = Rows.Where(r => r.TryGetValue(pkColumnName, out var value) && KeyEqual(value, id)).ToList();
+
+            if (toRemove.Count == 0)
+            {
+                return 0;
+            }
+
+            var totalRemoved = 0;
+
+            foreach (var row in toRemove)
+            {
+                var pkValue = row[pkColumnName];
+
+                foreach (var child in _db.Model.TablesSchema)
+                {
+                    foreach (var fk in child.ForeignKeys.Where(fk => fk.ReferencedTable == _table && fk.ReferencedColumn == pkColumnName))
+                    {
+                        totalRemoved += DeleteChildren(child.Name, fk.Column, pkValue);
+                    }
+                }
+
+                Rows.Remove(row);
+                totalRemoved++;
+            }
+
+            return totalRemoved;
         }
 
         public IEnumerable<TParent> Include<TParent, TChild>(
@@ -219,13 +256,18 @@ namespace Cronus.Runtime
             return lefts;
         }
 
-        private int DeleteChildren(string childTable, string fkColumn, object parentId)
+        private int DeleteChildren(string parentTable, string fkColumn, object parentId)
         {
-            if (!_db.Model.Data.TryGetValue(childTable, out var list))
+            if (!_db.Model.Data.TryGetValue(parentTable, out var list))
                 return 0;
 
-            var pkName = EntityMapper.GetPrimaryKey<T>().Name;
-            var toRemove = Rows.Where(r => r.TryGetValue(pkName, out var value) && Equals(value, parentId)).ToList();
+            var schema = _db.Model.TablesSchema.First(t => t.Name == parentTable);
+            var pkName = schema.Columns!.First(c => c.IsPrimaryKey).Name;
+
+            var toRemove = list
+                .Where(r => r.TryGetValue(fkColumn, out var value) && Equals(value, parentId))
+                .ToList();
+
             var removed = 0;
 
             foreach (var row in toRemove)
@@ -233,13 +275,15 @@ namespace Cronus.Runtime
                 list.Remove(row);
                 removed++;
 
-                var childSchema = _db.Model.TablesSchema.First(t => t.Name == childTable);
-                var childPk = childSchema.Columns!.First(c => c.IsPrimaryKey).Name;
-                var childId = row[childPk];
+                var childId = row[pkName];
 
-                foreach (var grandFk in childSchema.ForeignKeys)
+                foreach (var grand in _db.Model.TablesSchema)
                 {
-                    removed += DeleteChildren(grandFk.ReferencedTable, grandFk.Column, childId);
+                    foreach (var grandFk in grand.ForeignKeys
+                        .Where(fk => fk.ReferencedTable == parentTable && fk.ReferencedColumn == pkName))
+                    {
+                        removed += DeleteChildren(grand.Name, grandFk.Column, childId!);
+                    }
                 }
             }
 

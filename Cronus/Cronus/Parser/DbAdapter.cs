@@ -1,11 +1,10 @@
 ﻿using Cronus.DataAccess;
 using Cronus.DataAccess.Model;
 using Cronus.Interfaces;
-using Cronus.Parser;
 using Cronus.Utils;
 using System.Data;
 
-namespace Cronus.Runtime
+namespace Cronus.Parser
 {
     internal class DbAdapter : IDbAdapter
     {
