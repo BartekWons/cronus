@@ -20,7 +20,7 @@ namespace Cronus.API
             return query;
         }
 
-        public IEnumerable<TParent> Include<TParent, TChild>(
+        public IEnumerable<TParent> Join<TParent, TChild>(
             IEnumerable<TParent> parents,
             Expression<Func<IEnumerable<TChild>>> navigation,
             string mappedByFk)
@@ -46,50 +46,6 @@ namespace Cronus.API
             }
 
             return parents;
-        }
-
-        public IEnumerable<TLeft> IncludeManyToMany<TLeft, TRight>(
-            IEnumerable<TLeft> lefts,
-            Expression<Func<TLeft, IEnumerable<TRight>>> navigation)
-            where TLeft : class, new()
-            where TRight : class, new()
-        {
-            var navProp = (navigation.Body as MemberExpression)?.Member
-                ?? throw new ArgumentException("Navigation must be property");
-
-            var leftTable = EntityMapper.GetTableName<TLeft>();
-            var rightTable = EntityMapper.GetTableName<TRight>();
-
-            var joinTable = string.CompareOrdinal(leftTable, rightTable) < 0
-                ? $"{leftTable}_{rightTable}" : $"{rightTable}_{leftTable}";
-            var leftPk = EntityMapper.GetPrimaryKey<TLeft>().Name;
-            var rightPk = EntityMapper.GetPrimaryKey<TRight>().Name;
-            var leftKeyCol = $"{leftTable.Trim('s')}Id";
-            var rightKeyCol = $"{rightTable.Trim('s')}Id";
-
-            if (!_db.Model.Data.TryGetValue(joinTable, out var joinRows))
-                return lefts;
-
-            var rightRows = _db.Model.Data[rightTable];
-
-            foreach (var l in lefts)
-            {
-                var id = l.GetType().GetProperty(leftPk)!.GetValue(l);
-                var rightIds = joinRows
-                    .Where(r => Equals(r[leftKeyCol], id))
-                    .Select(r => r[rightKeyCol])
-                    .ToHashSet();
-
-                var rights = rightRows
-                    .Where(r => rightIds.Contains(r[rightPk]))
-                    .Select(EntityMapper.FromRow<TRight>)
-                    .ToList();
-
-                var propInfo = l.GetType().GetProperty(navProp.Name)!;
-                propInfo.SetValue(l, rights);
-            }
-
-            return lefts;
         }
     }
 }

@@ -46,16 +46,7 @@ namespace Cronus.Runtime
             where TParent : class, new()
             where TChild : class, new()
         {
-            return _selectApi.Include(parents, navigation, mappedByFk);
-        }
-
-        public IEnumerable<TLeft> IncludeManyToMany<TLeft, TRight>(
-            IEnumerable<TLeft> lefts,
-            Expression<Func<TLeft, IEnumerable<TRight>>> navigation)
-            where TLeft : class, new()
-            where TRight : class, new()
-        {
-            return _selectApi.IncludeManyToMany(lefts, navigation);
+            return _selectApi.Join(parents, navigation, mappedByFk);
         }
     }
 }
