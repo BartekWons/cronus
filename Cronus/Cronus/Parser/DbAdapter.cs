@@ -1,41 +1,22 @@
 ﻿using Cronus.DataAccess;
 using Cronus.DataAccess.Model;
 using Cronus.Interfaces;
-using Cronus.Parser;
 using Cronus.Utils;
 using System.Data;
 
-namespace Cronus.Runtime
+namespace Cronus.Parser
 {
-    internal class DatabaseAdapter : IDatabaseAdapter
+    internal class DbAdapter : IDbAdapter
     {
         private readonly Database _db;
         private readonly DbSchemaHelper _schemaHelper;
-        public DatabaseAdapter(Database db)
+        public DbAdapter(Database db)
         {
             _db = db;
             _schemaHelper = new DbSchemaHelper(db);
         }
 
-        public Task<int> DeleteAsync(string table, ICondition? where)
-        {
-            if (!_db.Model.Data.TryGetValue(table, out var rows))
-            {
-                return Task.FromResult(0);
-            }
-
-            var toDelete = rows.Where(r => Matches(where, r)).ToList();
-            var totalRemoved = 0;
-
-            foreach(var row in toDelete)
-            {
-                totalRemoved += DeleteWithCascade(table, row);
-            }
-
-            return Task.FromResult(totalRemoved);
-        }
-
-        public Task InsertAsync(string table, IReadOnlyDictionary<string, object>? values)
+        public Task<bool> InsertAsync(string table, IReadOnlyDictionary<string, object>? values)
         {
             if (values is null)
             {
@@ -63,9 +44,32 @@ namespace Cronus.Runtime
                 row[col.Name] = v;
             }
 
+            var pkName = _schemaHelper.GetPrimaryKeyName(table);
+
+            if (row.TryGetValue(pkName, out var pkValue) && pkValue is null)
+            {
+                int nextPk = 1;
+
+                if (rows.Any())
+                {
+                    nextPk = rows
+                        .Where(r => r.TryGetValue(pkName, out var v) && v is not null)
+                        .Select(r => Convert.ToInt32(r[pkName]))
+                        .DefaultIfEmpty(0)
+                        .Max() + 1;
+                }
+                row[pkName] = nextPk;
+                pkValue = nextPk;
+            }
+
+            if (rows.Any(r => r.TryGetValue(pkName, out var existing) && KeyEqual(existing, pkValue)))
+            {
+                return Task.FromResult(false);
+            }
+
             rows.Add(row);
 
-            return Task.CompletedTask;
+            return Task.FromResult(true);
         }
 
         public Task<IReadOnlyList<IDictionary<string, object?>>> SelectAsync(string table, IReadOnlyList<string> columns, ICondition? whereCondition)
@@ -133,24 +137,22 @@ namespace Cronus.Runtime
             return Task.FromResult(affected);
         }
 
-        private bool Matches(ICondition? where, IDictionary<string, object>? row)
+        public Task<int> DeleteAsync(string table, ICondition? where)
         {
-            if (where is null)
+            if (!_db.Model.Data.TryGetValue(table, out var rows))
             {
-                return true;
+                return Task.FromResult(0);
             }
 
-            if (where is BinaryCondition bc)
-            {
-                if (!row.TryGetValue(bc.Left, out var value))
-                {
-                    return false;
-                }
+            var toDelete = rows.Where(r => Matches(where, r)).ToList();
+            var totalRemoved = 0;
 
-                return Equals(value, bc.Right);
+            foreach (var row in toDelete)
+            {
+                totalRemoved += DeleteWithCascade(table, row);
             }
 
-            throw new NotSupportedException("Only simple binary conditions are supported");
+            return Task.FromResult(totalRemoved);
         }
 
         private int DeleteWithCascade(string table, IDictionary<string, object?> row)
@@ -166,13 +168,13 @@ namespace Cronus.Runtime
                     .Where(fk => fk.ReferencedTable.Equals(
                         table, StringComparison.OrdinalIgnoreCase) && fk.CascadeDelete))
                 {
-                    if (_db.Model.Data.TryGetValue(childTable.Name, out var childRows))
+                    if (!_db.Model.Data.TryGetValue(childTable.Name, out var childRows))
                     {
                         continue;
                     }
 
                     var toRemovedChildren = childRows
-                        .Where(r => r.TryGetValue(fk.Column, out var val) && Equals(val, pkValue))
+                        .Where(r => r.TryGetValue(fk.Column, out var val) && KeyEqual(val, pkValue))
                         .ToList();
 
                     foreach (var childRow in toRemovedChildren)
@@ -184,11 +186,81 @@ namespace Cronus.Runtime
 
             if (_db.Model.Data.TryGetValue(table, out var rows))
             {
-                if (rows.Remove(row.ToDictionary()))
+                if (rows.Remove((Dictionary<string, object?>)row))
                     removed++;
             }
 
             return removed;
+        }
+
+        private static bool KeyEqual(object? a, object? b)
+        {
+            if (a is null && b is null) return true;
+            if (a is null || b is null) return false;
+
+            if (a is IConvertible && b is IConvertible)
+            {
+                try
+                {
+                    var da = Convert.ToInt64(a);
+                    var db = Convert.ToInt64(b);
+                    return da == db;
+                }
+                catch
+                {
+
+                }
+            }
+
+            return a.Equals(b);
+        }
+
+        private bool Matches(ICondition? where, IDictionary<string, object>? row)
+        {
+            if (where is null)
+            {
+                return true;
+            }
+
+            if (where is not BinaryCondition)
+            {
+                throw new NotSupportedException("Only simple binary conditions are supported");
+            }
+
+            var bc = where as BinaryCondition;
+
+            if (!row.TryGetValue(bc.Left, out var value))
+                return false;
+
+            switch (bc.Operator)
+            {
+                case "=":
+                    return KeyEqual(value, bc.Right);
+                case "!=":
+                    return !KeyEqual(value, bc.Right);
+                case "<":
+                    return Compare(value, bc.Right) < 0;
+                case ">":
+                    return Compare(value, bc.Right) > 0;
+                case "<=":
+                    return Compare(value, bc.Right) <= 0;
+                case ">=":
+                    return Compare(value, bc.Right) >= 0;
+                default:
+                    throw new NotSupportedException("Not supported condition");
+            }
+        }
+
+        private static int Compare(object? a, object? b)
+        {
+            if (a is IConvertible && b is IConvertible)
+            {
+                var da = Convert.ToDouble(a);
+                var db = Convert.ToDouble(b);
+                return da.CompareTo(db);
+            }
+
+            throw new InvalidOperationException("Cannot compare non-numeric values");
         }
     }
 }

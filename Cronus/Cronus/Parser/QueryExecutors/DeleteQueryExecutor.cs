@@ -5,7 +5,7 @@ namespace Cronus.Parser.QueryExecutors
 {
     internal class DeleteQueryExecutor : QueryExecutorBase, IQueryExecutor<DeleteQuery>
     {
-        public DeleteQueryExecutor(IDatabaseAdapter db) : base(db) { }
+        public DeleteQueryExecutor(IDbAdapter db) : base(db) { }
 
         public async Task<object?> ExecuteAsync(DeleteQuery query)
         {

@@ -8,12 +8,12 @@ namespace Cronus.Tests.QueryExecutors
     public class SqlQueryExecutorTests
     {
         [TestCase(@"SELECT * FROM Users")]
-        [TestCase(@"INSERT INTO Users (UserId, Name) VALUES (1, ""Tom"")")]
-        [TestCase(@"UPDATE Users SET Name = ""Tom"" WHERE UserId = 1")]
+        [TestCase(@"INSERT INTO Users (UserId, Name) VALUES (1, 'Tom')")]
+        [TestCase(@"UPDATE Users SET Name = 'Tom' WHERE UserId = 1")]
         [TestCase(@"DELETE FROM Users WHERE UserId = 1")]
         public async Task ExecuteAsync_ValidSql_ShouldNotThrow(string sql)
         {
-            var dbAdapterMock = new Mock<IDatabaseAdapter>();
+            var dbAdapterMock = new Mock<IDbAdapter>();
 
             dbAdapterMock.Setup(db => db.SelectAsync(
                 It.IsAny<string>(),
@@ -24,7 +24,7 @@ namespace Cronus.Tests.QueryExecutors
             dbAdapterMock.Setup(db => db.InsertAsync(
                 It.IsAny<string>(),
                 It.IsAny<IReadOnlyDictionary<string, object?>>()))
-                .Returns(Task.CompletedTask);
+                .Returns(Task.FromResult(true));
 
             dbAdapterMock.Setup(db => db.UpdateAsync(
                 It.IsAny<string>(),
@@ -43,12 +43,12 @@ namespace Cronus.Tests.QueryExecutors
         }
 
         [TestCase(@"SELECT FROM Users")]
-        [TestCase(@"INSERT Users VALUES (1, ""Tom"")")]
-        [TestCase(@"UPDATE SET Name = ""Tom""")]
+        [TestCase(@"INSERT Users VALUES (1, 'Tom')")]
+        [TestCase(@"UPDATE SET Name = 'Tom'")]
         [TestCase(@"DELETE Users WHERE Id = 1")]
         public void ExecuteAsync_InvalidSql_ShouldThrowInvalidOperationException(string sql)
         {
-            var dbAdapterMock = new Mock<IDatabaseAdapter>();
+            var dbAdapterMock = new Mock<IDbAdapter>();
             var sut = new SqlQueryExecutor(dbAdapterMock.Object);
 
             Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.ExecuteAsync(sql));

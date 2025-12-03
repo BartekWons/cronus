@@ -7,7 +7,7 @@ namespace Cronus.Parser.QueryExecutors
         private readonly IQueryParser _parser;
         private readonly QueryExecutorFactory _factory;
 
-        public SqlQueryExecutor(IDatabaseAdapter db)
+        public SqlQueryExecutor(IDbAdapter db)
         {
             _parser = new QueryParser();
             _factory = new QueryExecutorFactory(db);

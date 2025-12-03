@@ -4,9 +4,9 @@ namespace Cronus.Parser.QueryExecutors
 {
     internal class QueryExecutorBase
     {
-        protected readonly IDatabaseAdapter Db;
+        protected readonly IDbAdapter Db;
 
-        public QueryExecutorBase(IDatabaseAdapter db)
+        public QueryExecutorBase(IDbAdapter db)
         {
             Db = db;
         }

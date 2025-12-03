@@ -5,7 +5,7 @@ namespace Cronus.Parser.QueryExecutors
 {
     internal class UpdateQueryExecutor : QueryExecutorBase, IQueryExecutor<UpdateQuery>
     {
-        public UpdateQueryExecutor(IDatabaseAdapter db) : base(db) { }
+        public UpdateQueryExecutor(IDbAdapter db) : base(db) { }
 
         public async Task<object?> ExecuteAsync(UpdateQuery query)
         {

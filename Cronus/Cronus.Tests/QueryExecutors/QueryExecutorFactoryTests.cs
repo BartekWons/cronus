@@ -11,7 +11,7 @@ namespace Cronus.Tests.QueryExecutors
         [Test]
         public async Task ExecuteAsync_SelectQuery_ShouldCallSelectAsyncAndReturnRows()
         {
-            var dbAdapterMock = new Mock<IDatabaseAdapter>();
+            var dbAdapterMock = new Mock<IDbAdapter>();
 
             var expectedRows = new List<IDictionary<string, object?>>
             {
@@ -45,13 +45,13 @@ namespace Cronus.Tests.QueryExecutors
         [Test]
         public async Task ExecuteAsync_InsertQuery_ShouldCallInsertAsync()
         {
-            var dbAdapterMock = new Mock<IDatabaseAdapter>();
+            var dbAdapterMock = new Mock<IDbAdapter>();
 
             dbAdapterMock
                 .Setup(db => db.InsertAsync(
                     It.IsAny<string>(),
                     It.IsAny<IReadOnlyDictionary<string, object?>>()))
-                .Returns(Task.CompletedTask);
+                .Returns(Task.FromResult(true));
 
             var factory = new QueryExecutorFactory(dbAdapterMock.Object);
 
@@ -71,7 +71,7 @@ namespace Cronus.Tests.QueryExecutors
         [Test]
         public async Task ExecuteAsync_UpdateQuery_ShouldCallUpdateAsyncAndReturnCount()
         {
-            var dbAdapterMock = new Mock<IDatabaseAdapter>();
+            var dbAdapterMock = new Mock<IDbAdapter>();
 
             dbAdapterMock
                 .Setup(db => db.UpdateAsync(
@@ -97,7 +97,7 @@ namespace Cronus.Tests.QueryExecutors
         [Test]
         public async Task ExecuteAsync_DeleteQuery_ShouldCallDeleteAsyncAndReturnCount()
         {
-            var dbAdapterMock = new Mock<IDatabaseAdapter>();
+            var dbAdapterMock = new Mock<IDbAdapter>();
 
             dbAdapterMock
                 .Setup(db => db.DeleteAsync(
