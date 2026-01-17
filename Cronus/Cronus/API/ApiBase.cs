@@ -1,5 +1,4 @@
 ﻿using Cronus.DataAccess;
-using Cronus.DataAccess.Model;
 using Cronus.Utils;
 
 namespace Cronus.API

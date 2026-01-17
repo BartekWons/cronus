@@ -22,7 +22,7 @@ namespace Cronus.API
 
         public IEnumerable<TParent> Join<TParent, TChild>(
             IEnumerable<TParent> parents,
-            Expression<Func<IEnumerable<TChild>>> navigation,
+            Expression<Func<TParent, IEnumerable<TChild>>> navigation,
             string mappedByFk)
             where TParent : class, new()
             where TChild : class, new()
