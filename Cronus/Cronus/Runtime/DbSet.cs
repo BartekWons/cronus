@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace Cronus.Runtime
 {
-    public class DbSet<T> where T : new()
+    public class DbSet<T> where T : class, new()
     {
         private readonly SelectApi<T> _selectApi;
         private readonly InsertApi<T> _insertApi;
@@ -39,14 +39,13 @@ namespace Cronus.Runtime
             return _deleteApi.Delete(predicate);
         }
 
-        public IEnumerable<TParent> Include<TParent, TChild>(
-            IEnumerable<TParent> parents,
-            Expression<Func<IEnumerable<TChild>>> navigation,
+        public IEnumerable<T> Include<TChild>(
+            IEnumerable<T> parents,
+            Expression<Func<T, IEnumerable<TChild>>> navigation,
             string mappedByFk)
-            where TParent : class, new()
             where TChild : class, new()
         {
-            return _selectApi.Join(parents, navigation, mappedByFk);
+            return _selectApi.Join<T, TChild>(parents, navigation, mappedByFk);
         }
     }
 }
