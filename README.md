@@ -120,6 +120,12 @@ builder
 var runtime = await builder.BuildRuntimeAsync();
 ```
 
+---
+
+## Operations on data
+
+### API
+
 To operate on data with API firstly use `GetTable<T>` to extract data from database. 
 
 ```csharp
@@ -129,8 +135,8 @@ var customers = runtime.GetTable<Customer>();
 
 customers.Insert(new Customer
 {
-    Name = "Adam Nowak",
-    Email = "adam@nowak.pl"
+    Name = "Tom Hardy",
+    Email = "tom@hardy.com"
 });
 
 var allCustomers = customers.Select().ToList();
@@ -144,6 +150,8 @@ customers.Include<Order>(
 await runtime.SaveChangesAsync();
 ```
 
+### Queries
+
 Operation on data using queries is enable by using `Query` method directly on `runtime` object. 
 
 ```csharp
@@ -151,7 +159,7 @@ var runtime = await builder.BuildRuntimeAsync();
 
 
 var selectResult = runtime.Query("SELECT * FROM Customers WHERE CustomerId = 1");
-var deleteResult = runtime.Query("DELETE FROM Orders WHERE Name = 'Jerry'");
+var deleteResult = runtime.Query("DELETE FROM Orders WHERE Name = 'XYZ'");
 
 await runtime.SaveChangesAsync();
 ```
