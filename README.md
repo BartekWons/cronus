@@ -152,7 +152,7 @@ await runtime.SaveChangesAsync();
 
 ### Queries
 
-Operation on data using queries is enable by using `Query` method directly on `runtime` object. 
+Operation on data using queries is provided by `Query` method used directly on `runtime` object. 
 
 ```csharp
 var runtime = await builder.BuildRuntimeAsync();
