@@ -92,3 +92,29 @@ public class Order
     public List<OrderItem> Items { get; set; } = new();
 }
 ```
+
+## Builder Configuration
+
+Before working with the database, it is necessary to configure the runtime environment using the `DbBuilder`.  
+This step defines the database location and registers all entity tables that will be managed by Cronus.
+
+### Example: Builder Setup
+
+```csharp
+using Cronus.Builders;
+using Demo.Model;
+
+var builder = DbBuilder.CreateBuilder();
+
+// Define database file
+builder.AddConnectionString("Example_database");
+
+// Register entity tables
+builder
+    .AddTable(typeof(Customer))
+    .AddTable(typeof(Order))
+    .AddTable(typeof(OrderItem))
+    .AddTable(typeof(Product));
+
+// Build runtime instance
+var runtime = await builder.BuildRuntimeAsync();
