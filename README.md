@@ -21,8 +21,6 @@ The library combines a **custom ORM layer** with a **SQL-inspired query language
 - Data filtering and querying
 - One-to-many (1:N) table relationships
 - Automatic primary key handling (auto-increment)
-- Schema and data validation
-- Lightweight and infrastructure-free
 
 ---
 
@@ -93,6 +91,8 @@ public class Order
 }
 ```
 
+---
+
 ## Builder Configuration
 
 Before working with the database, it is necessary to configure the runtime environment using the `DbBuilder`.  
@@ -118,3 +118,40 @@ builder
 
 // Build runtime instance
 var runtime = await builder.BuildRuntimeAsync();
+```
+
+To operate on data with API firstly use `GetTable<T>` to extract data from database. 
+
+```csharp
+var runtime = await builder.BuildRuntimeAsync();
+
+var customers = runtime.GetTable<Customer>();
+
+customers.Insert(new Customer
+{
+    Name = "Adam Nowak",
+    Email = "adam@nowak.pl"
+});
+
+var allCustomers = customers.Select().ToList();
+
+customers.Include<Order>(
+    allCustomers,
+    c => c.Orders,
+    "CustomerId"
+);
+
+await runtime.SaveChangesAsync();
+```
+
+Operation on data using queries is enable by using `Query` method directly on `runtime` object. 
+
+```csharp
+var runtime = await builder.BuildRuntimeAsync();
+
+
+var selectResult = runtime.Query("SELECT * FROM Customers WHERE CustomerId = 1");
+var deleteResult = runtime.Query("DELETE FROM Orders WHERE Name = 'Jerry'");
+
+await runtime.SaveChangesAsync();
+```
